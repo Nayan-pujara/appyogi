@@ -81,7 +81,7 @@ app.get("/key-data", (req, res) => {
 });
 
 app.get("/get-control", (req, res) => {
-  res.status(200).json({ status: 200, data: control });
+  res.status(200).json({ status: "success", data: control });
 });
 
 app.post("/set-control", (req, res) => {
@@ -91,7 +91,7 @@ app.post("/set-control", (req, res) => {
     control = null;
   }, 120000);
 
-  res.status(200).json({ status: 200, data: control });
+  res.status(200).json({ status: "success", data: control });
 });
 
 app.listen(5000, () => {
