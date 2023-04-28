@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>App Yogi</title>
+    <style>
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(5, 50px);
+        grid-template-rows: repeat(2, 50px);
+      }
+
+      .item {
+        text-align: center;
+        background-color: #fff;
+        border: 1px solid #000;
+      }
+
+      .user-1 {
+        background-color: red;
+      }
+
+      .user-2 {
+        background-color: yellow;
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div class="grid">
+      <div class="item" id="1">1</div>
+      <div class="item" id="2">2</div>
+      <div class="item" id="3">3</div>
+      <div class="item" id="4">4</div>
+      <div class="item" id="5">5</div>
+      <div class="item" id="6">6</div>
+      <div class="item" id="7">7</div>
+      <div class="item" id="8">8</div>
+      <div class="item" id="9">9</div>
+      <div class="item" id="10">10</div>
+    </div>
+    <button id="control">Take Control</button>
+  </body>
+  <script>
+    $(document).ready(function () {
+      const currentUrl = window.location.href.split("?");
+      let controlData = null;
+
+      $(".grid").on("click", "div", function () {
+        const keyId = $(this).attr("id");
+
+        if (controlData === currentUrl[1]) {
+          $.ajax({
+            type: "POST",
+            url: `${currentUrl[0]}key-press?${currentUrl[1]}`,
+            data: {
+              key: keyId,
+            },
+            success: function (response) {
+              if (response.data === "remove") {
+                if (currentUrl[1] === "user=1") {
+                  $(`#${keyId}`).removeClass("user-1");
+                }
+                if (currentUrl[1] === "user=2") {
+                  $(`#${keyId}`).removeClass("user-2");
+                }
+              }
+
+              if (response.data === "add") {
+                if (currentUrl[1] === "user=1") {
+                  $(`#${keyId}`).addClass("user-1");
+                }
+                if (currentUrl[1] === "user=2") {
+                  $(`#${keyId}`).addClass("user-2");
+                }
+              }
+            },
+          });
+        }
+      });
+
+      setInterval(() => {
+        $.ajax({
+          type: "GET",
+          url: `${currentUrl[0]}key-data`,
+          success: function (response) {
+            const keyData = response.data.map((d) => d.KEYBOARD_KEY);
+
+            for (let i = 1; i <= 10; i++) {
+              if (!keyData.includes(i)) {
+                $(`#${i}`).removeClass(`user-1`);
+                $(`#${i}`).removeClass(`user-2`);
+              }
+            }
+
+            response.data.forEach((element) => {
+              $(`#${element.KEYBOARD_KEY}`).addClass(`user-${element.USER}`);
+            });
+          },
+        });
+
+        $.ajax({
+          type: "GET",
+          url: `${currentUrl[0]}get-control`,
+          success: function (response) {
+            controlData = response.data;
+
+            if (response.data) {
+              $("#control").prop("disabled", true);
+            } else {
+              $("#control").prop("disabled", false);
+            }
+          },
+        });
+      }, 500);
+
+      $("#control").click(() => {
+        $.ajax({
+          type: "POST",
+          url: `${currentUrl[0]}set-control`,
+          data: {
+            control: currentUrl[1],
+          },
+          success: function (response) {},
+        });
+      });
+    });
+  </script>
+</html>
