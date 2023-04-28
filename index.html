@@ -58,25 +58,7 @@
             data: {
               key: keyId,
             },
-            success: function (response) {
-              if (response.data === "remove") {
-                if (currentUrl[1] === "user=1") {
-                  $(`#${keyId}`).removeClass("user-1");
-                }
-                if (currentUrl[1] === "user=2") {
-                  $(`#${keyId}`).removeClass("user-2");
-                }
-              }
-
-              if (response.data === "add") {
-                if (currentUrl[1] === "user=1") {
-                  $(`#${keyId}`).addClass("user-1");
-                }
-                if (currentUrl[1] === "user=2") {
-                  $(`#${keyId}`).addClass("user-2");
-                }
-              }
-            },
+            success: function (response) {},
           });
         }
       });
